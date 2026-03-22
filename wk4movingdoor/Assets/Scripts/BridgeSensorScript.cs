@@ -39,10 +39,10 @@ public class BridgeSensorScript : MonoBehaviour
             BridgeAnim.SetFloat("moveNot", -1.0f);
             
             // Optional: Play the sound again (or a different one) when closing
-            if (bridgeSound != null)
-            {
-                audioSource.PlayOneShot(bridgeSound);
-            }
+            // if (bridgeSound != null)
+            // {
+            //     audioSource.PlayOneShot(bridgeSound);
+            // }
         }
     }
 }

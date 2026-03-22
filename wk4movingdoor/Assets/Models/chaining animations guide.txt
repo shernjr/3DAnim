@@ -1,0 +1,70 @@
+1. Preparation: Importing Mixamo Clips
+Before chaining, ensure your animations are compatible with your character: 
+Rig Setup: Select the imported Mixamo FBX files in the Project window. In the Inspector, go to the Rig tab, set the Animation Type to Humanoid, and click Apply.
+Avatar Definition: Choose "Copy From Other Avatar" and select the avatar created for your main character model to ensure perfect retargeting.
+Extract Clips: To edit clip settings (like looping), select the FBX, find the animation clip inside, and press Ctrl+D to duplicate it into a standalone .anim file. 
+YouTube
+YouTube
+ +2
+2. Method A: Chaining with Animator Controller (Best for Gameplay)
+This method uses state machines to trigger animations based on logic. 
+Create Controller: Right-click in the Project window and select Create > Animator Controller.
+Add States: Drag your Mixamo clips into the Animator Window. This creates states for each animation.
+Create Transitions: Right-click the first state (e.g., "Idle") and select Make Transition, then click the second state (e.g., "Walk").
+Configure Blending: Click the transition arrow. In the Inspector, adjust the Fixed Duration and Transition Duration to create a smooth crossfade between the two animations.
+Automatic Chaining: To make one animation follow another automatically, ensure the transition has Has Exit Time checked and the Exit Time set to 1 (100% of the first animation). 
+YouTube
+YouTube
+ +4
+3. Method B: Chaining with Unity Timeline (Best for Cutscenes)
+Timeline allows you to drag, drop, and overlap clips on a linear track.
+Open Timeline: Go to Window > Sequencing > Timeline.
+Add Animation Track: Drag your character from the Hierarchy into the Timeline window and select Add Animation Track.
+Sequence Clips: Drag your Mixamo clips onto this track in the desired order.
+Blend Clips: Drag the clips so they slightly overlap. Unity will automatically create a blend curve for a seamless transition between them. 
+YouTube
+YouTube
+ +4
+4. Advanced: Animation Layers (Partial Chaining)
+If you want to play a "wave" animation while "walking," use Animation Layers: 
+Create a new layer in the Animator window and set its Weight to 1.
+Use an Avatar Mask to restrict the second layer to only the upper body (e.g., arms), allowing the base layer to control the legs.
+
+
+clipping through floor fix:
+Gemini said
+That Flying Kick is likely the culprit because of how Mixamo handles vertical movement (the Y-axis). When your character "jumps" or "flies" in an animation, the actual Transform position of the object might be staying on the ground while the mesh flies up, or vice-versa, causing the physics engine to get confused and "pop" the character through the floor.
+
+Looking at your screenshot, I see a few immediate red flags that are likely causing this:
+
+1. Uncheck the "Static" Box
+In the top right of your Inspector, the character is marked as Static.
+
+The Problem: Static objects are telling Unity "I will never move." When an Animator or Rigidbody tries to move a static object, the physics engine breaks, often leading to objects clipping through floors or jumping around.
+
+The Fix: Uncheck that box. Dynamic characters should never be static.
+
+2. Check your "Bake Into Pose" Settings
+For a flying kick, you usually want the character's physical height to be controlled by the animation's vertical movement.
+
+Select the 4AnakinFlyingKick animation file in your Project window.
+
+In the Inspector, go to the Animation tab.
+
+Scroll down to Root Transform Position (Y).
+
+If Bake Into Pose is checked, the character’s "physical" center stays at the same height while the legs move. If it's unchecked, the whole object rises.
+
+Try this: Ensure Bake Into Pose (Y) is Checked and set to Original or Center. This keeps the Rigidbody/Collider from falling through the floor while the character is mid-air.
+
+3. Adjust your Capsule Collider
+Your Capsule Collider is currently 9.7 units tall with a scale of 0.18. That is a massive collider for a standard character.
+
+The Problem: If a collider is too large or clips into the floor slightly at the start of an animation, Unity's physics engine will "eject" the object to resolve the overlap. This often pushes the character down through the floor.
+
+The Fix: Shrink the Height and Radius of the Capsule Collider so it tightly fits the character's body. If the kick animation makes the character's legs wide, the collider might be hitting the floor in a weird way.
+
+4. Rigidbody Collision Detection
+Since a flying kick is a fast motion:
+
+Change Collision Detection from Discrete to Continuous. This prevents the character from moving so fast in one frame that they pass through the floor before the physics engine can check for a collision.
