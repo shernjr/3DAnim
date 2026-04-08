@@ -27,6 +27,11 @@ public class YbotIKController : MonoBehaviour
             isUpdatingIKPositions = true;
         }
 
+        if (InputSystem.actions.FindAction("Throw").WasPerformedThisFrame())
+        {
+            animator.SetTrigger("throw");
+        }
+
 
         
     }
@@ -57,6 +62,12 @@ public class YbotIKController : MonoBehaviour
         isUpdatingIKPositions = false;
         targetTransform.SetParent(handHardPoint);
         targetTransform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+        Rigidbody rb = targetTransform.GetComponent<Rigidbody>();
+        
+        if (rb != null)
+        {
+            rb.isKinematic = true; // This stops gravity/physics from pulling it out of your hand
+        }
 
     }
 
@@ -64,9 +75,13 @@ public class YbotIKController : MonoBehaviour
     {
         //Throw animation event Throw calls this method.
         //At the end of the throw animation, we want to unparent the object and apply a force to it.
+        if (targetTransform == null) return;
         targetTransform.SetParent(null);
         Rigidbody rb = targetTransform.GetComponent<Rigidbody>();
-        if (rb != null)        {
+        if (rb != null)        
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
             rb.AddForce(transform.forward * 10f, ForceMode.Impulse);
         }
         
