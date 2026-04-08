@@ -59,6 +59,18 @@ public class YbotIKController : MonoBehaviour
         targetTransform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 
     }
+
+    private void OnThrow()
+    {
+        //Throw animation event Throw calls this method.
+        //At the end of the throw animation, we want to unparent the object and apply a force to it.
+        targetTransform.SetParent(null);
+        Rigidbody rb = targetTransform.GetComponent<Rigidbody>();
+        if (rb != null)        {
+            rb.AddForce(transform.forward * 10f, ForceMode.Impulse);
+        }
+        
+    }
 }
 
 
